@@ -80,7 +80,8 @@ import {
   calculateDraggedItemNewPathname,
   transformFolderRootToSave,
   getTreePathFromCollectionToItem,
-  mergeHeaders
+  mergeHeaders,
+  isItemADoc
 } from 'utils/collections/index';
 import { sanitizeName } from 'utils/common/regex';
 import { buildPersistedEnvVariables } from 'utils/environments';
@@ -724,7 +725,7 @@ export const newFolder = (folderName, directoryName, collectionUid, itemUid) => 
   const state = getState();
   const collection = findCollectionByUid(state.collections.collections, collectionUid);
   const parentItem = itemUid ? findItemInCollection(collection, itemUid) : collection;
-  const items = filter(parentItem.items, (i) => isItemAFolder(i) || isItemARequest(i));
+  const items = filter(parentItem.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
 
   return new Promise((resolve, reject) => {
     if (!collection) {
@@ -1362,7 +1363,7 @@ export const newHttpRequest = (params) => (dispatch, getState) => {
         (i) => isItemARequest(i) && i.pathname && i.pathname.startsWith(tempDirectory)
       );
       const reqWithSameNameExists = find(transientRequests, (i) => trim(i.filename) === trim(resolvedFilename));
-      const items = filter(collection.items, (i) => isItemAFolder(i) || isItemARequest(i));
+      const items = filter(collection.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
       item.seq = items.length + 1;
 
       if (!reqWithSameNameExists) {
@@ -1394,7 +1395,7 @@ export const newHttpRequest = (params) => (dispatch, getState) => {
         collection.items,
         (i) => i.type !== 'folder' && trim(i.filename) === trim(resolvedFilename)
       );
-      const items = filter(collection.items, (i) => isItemAFolder(i) || isItemARequest(i));
+      const items = filter(collection.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
       item.seq = items.length + 1;
 
       if (!reqWithSameNameExists) {
@@ -1426,7 +1427,7 @@ export const newHttpRequest = (params) => (dispatch, getState) => {
           currentItem.items,
           (i) => i.type !== 'folder' && trim(i.filename) === trim(resolvedFilename)
         );
-        const items = filter(currentItem.items, (i) => isItemAFolder(i) || isItemARequest(i));
+        const items = filter(currentItem.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
         item.seq = items.length + 1;
         if (!reqWithSameNameExists) {
           const fullName = path.join(currentItem.pathname, resolvedFilename);
@@ -1451,6 +1452,66 @@ export const newHttpRequest = (params) => (dispatch, getState) => {
         }
       }
     }
+  });
+};
+
+export const newDocPage = (params) => (dispatch, getState) => {
+  const {
+    name,
+    filename,
+    collectionUid,
+    itemUid,
+    docs = ''
+  } = params;
+
+  return new Promise((resolve, reject) => {
+    const state = getState();
+    const collection = findCollectionByUid(state.collections.collections, collectionUid);
+    if (!collection) {
+      return reject(new Error('Collection not found'));
+    }
+
+    const parentItem = itemUid ? findItemInCollection(collection, itemUid) : collection;
+    if (!parentItem) {
+      return reject(new Error('Parent item not found'));
+    }
+
+    const resolvedFilename = resolveRequestFilename(filename, collection.format);
+    const itemWithSameNameExists = find(
+      parentItem.items,
+      (i) => i.type !== 'folder' && trim(i.filename) === trim(resolvedFilename)
+    );
+
+    if (itemWithSameNameExists) {
+      return reject(new Error('Duplicate item names are not allowed under the same folder'));
+    }
+
+    const items = filter(parentItem.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
+    const item = {
+      uid: uuid(),
+      type: 'doc',
+      name,
+      filename,
+      seq: items.length + 1,
+      docs
+    };
+
+    const fullName = path.join(parentItem.pathname, resolvedFilename);
+    const { ipcRenderer } = window;
+    ipcRenderer
+      .invoke('renderer:new-request', fullName, item)
+      .then(() => {
+        dispatch(
+          insertTaskIntoQueue({
+            uid: uuid(),
+            type: 'OPEN_REQUEST',
+            collectionUid,
+            itemPathname: fullName
+          })
+        );
+        resolve();
+      })
+      .catch(reject);
   });
 };
 
@@ -1522,7 +1583,7 @@ export const newGrpcRequest = (params) => (dispatch, getState) => {
         return reject(new Error('Duplicate request names are not allowed under the same folder'));
       }
 
-      const items = filter(collection.items, (i) => isItemAFolder(i) || isItemARequest(i));
+      const items = filter(collection.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
       item.seq = items.length + 1;
       const fullName = path.join(tempDirectory, resolvedFilename);
       const { ipcRenderer } = window;
@@ -1559,7 +1620,7 @@ export const newGrpcRequest = (params) => (dispatch, getState) => {
         return reject(new Error('Duplicate request names are not allowed under the same folder'));
       }
 
-      const items = filter(parentItem.items, (i) => isItemAFolder(i) || isItemARequest(i));
+      const items = filter(parentItem.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
       item.seq = items.length + 1;
       const fullName = path.join(parentItem.pathname, resolvedFilename);
       const { ipcRenderer } = window;
@@ -1650,7 +1711,7 @@ export const newWsRequest = (params) => (dispatch, getState) => {
         return reject(new Error('Duplicate request names are not allowed under the same folder'));
       }
 
-      const items = filter(collection.items, (i) => isItemAFolder(i) || isItemARequest(i));
+      const items = filter(collection.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
       item.seq = items.length + 1;
       const fullName = path.join(tempDirectory, resolvedFilename);
       const { ipcRenderer } = window;
@@ -1687,7 +1748,7 @@ export const newWsRequest = (params) => (dispatch, getState) => {
         return reject(new Error('Duplicate request names are not allowed under the same folder'));
       }
 
-      const items = filter(parentItem.items, (i) => isItemAFolder(i) || isItemARequest(i));
+      const items = filter(parentItem.items, (i) => isItemAFolder(i) || isItemARequest(i) || isItemADoc(i));
       item.seq = items.length + 1;
       const fullName = path.join(parentItem.pathname, resolvedFilename);
       const { ipcRenderer } = window;

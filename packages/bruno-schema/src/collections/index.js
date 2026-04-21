@@ -617,7 +617,7 @@ const folderRootSchema = Yup.object({
 
 const itemSchema = Yup.object({
   uid: uidSchema,
-  type: Yup.string().oneOf(['http-request', 'graphql-request', 'folder', 'js', 'grpc-request', 'ws-request']).required('type is required'),
+  type: Yup.string().oneOf(['http-request', 'graphql-request', 'folder', 'js', 'grpc-request', 'ws-request', 'doc']).required('type is required'),
   seq: Yup.number().min(1),
   name: Yup.string().min(1, 'name must be at least 1 character').required('name is required'),
   tags: Yup.array().of(Yup.string().matches(/^[\p{L}\p{N}_-](?:[\p{L}\p{N}_\s-]*[\p{L}\p{N}_-])?$/u, 'tag must contain only letters, numbers, spaces, hyphens, or underscores')),
@@ -664,6 +664,11 @@ const itemSchema = Yup.object({
     is: (type) => ['http-request', 'graphql-request', 'grpc-request'].includes(type),
     then: (schema) => schema.nullable(),
     otherwise: Yup.array().strip()
+  }),
+  docs: Yup.string().when('type', {
+    is: 'doc',
+    then: Yup.string().nullable(),
+    otherwise: Yup.string().nullable().notRequired()
   }),
   filename: Yup.string().nullable(),
   pathname: Yup.string().nullable()

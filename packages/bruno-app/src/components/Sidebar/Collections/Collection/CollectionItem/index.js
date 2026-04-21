@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import range from 'lodash/range';
-import filter from 'lodash/filter';
 import classnames from 'classnames';
 import { useDrag, useDrop } from 'react-dnd';
 import {
   IconChevronRight,
   IconDots,
   IconFilePlus,
+  IconFileText,
   IconFolderPlus,
   IconPlayerPlay,
   IconEdit,
@@ -29,13 +29,14 @@ import { uuid } from 'utils/common';
 import { copyRequest, setFocusedSidebarPath } from 'providers/ReduxStore/slices/app';
 import NewRequest from 'components/Sidebar/NewRequest';
 import NewFolder from 'components/Sidebar/NewFolder';
+import NewDocPage from 'components/Sidebar/NewDocPage';
 import RenameCollectionItem from './RenameCollectionItem';
 import CloneCollectionItem from './CloneCollectionItem';
 import DeleteCollectionItem from './DeleteCollectionItem';
 import RunCollectionItem from './RunCollectionItem';
 import GenerateCodeItem from './GenerateCodeItem';
-import { isItemARequest, isItemAFolder } from 'utils/tabs';
-import { doesRequestMatchSearchText, doesFolderHaveItemsMatchSearchText } from 'utils/collections/search';
+import { isItemARequest, isItemAFolder, isItemADoc } from 'utils/tabs';
+import { doesRequestMatchSearchText, doesFolderHaveItemsMatchSearchText, doesDocMatchSearchText } from 'utils/collections/search';
 import { getDefaultRequestPaneTab } from 'utils/collections';
 import toast from 'react-hot-toast';
 import StyledWrapper from './StyledWrapper';
@@ -48,8 +49,7 @@ import { scrollToTheActiveTab } from 'utils/tabs';
 import { isTabForItemActive as isTabForItemActiveSelector, isTabForItemPresent as isTabForItemPresentSelector } from 'src/selectors/tab';
 import { isEqual } from 'lodash';
 import { createEmptyStateMenuItems } from 'utils/collections/emptyStateRequest';
-import { calculateDraggedItemNewPathname, getInitialExampleName, findParentItemInCollection } from 'utils/collections/index';
-import { sortByNameThenSequence } from 'utils/common/index';
+import { calculateDraggedItemNewPathname, getInitialExampleName, findParentItemInCollection, sortSidebarCollectionChildren } from 'utils/collections/index';
 import { getRevealInFolderLabel } from 'utils/common/platform';
 import CreateExampleModal from 'components/ResponseExample/CreateExampleModal';
 import { openDevtoolsAndSwitchToTerminal } from 'utils/terminal';
@@ -81,6 +81,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
   const [createExampleModalOpen, setCreateExampleModalOpen] = useState(false);
   const [generateCodeItemModalOpen, setGenerateCodeItemModalOpen] = useState(false);
   const [newRequestModalOpen, setNewRequestModalOpen] = useState(false);
+  const [newDocPageModalOpen, setNewDocPageModalOpen] = useState(false);
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
   const [runCollectionModalOpen, setRunCollectionModalOpen] = useState(false);
   const [itemInfoModalOpen, setItemInfoModalOpen] = useState(false);
@@ -153,9 +154,8 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
 
     if (isItemAFolder(item)) {
       return clientY < folderUpperThreshold ? 'adjacent' : 'inside';
-    } else {
-      return clientY < fileUpperThreshold ? 'adjacent' : null;
     }
+    return clientY < fileUpperThreshold ? 'adjacent' : null;
   };
 
   const canItemBeDropped = ({ draggedItem, targetItem, dropType }) => {
@@ -255,6 +255,22 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
           type: 'request'
         })
       );
+    } else if (isItemADoc(item)) {
+      if (isTabForItemPresent) {
+        dispatch(
+          focusTab({
+            uid: item.uid
+          })
+        );
+        return;
+      }
+      dispatch(
+        addTab({
+          uid: item.uid,
+          collectionUid: collectionUid,
+          type: 'doc'
+        })
+      );
     } else {
       dispatch(
         addTab({
@@ -323,6 +339,12 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
           leftSection: IconFilePlus,
           label: 'New Request',
           onClick: () => setNewRequestModalOpen(true)
+        },
+        {
+          id: 'new-doc-page',
+          leftSection: IconFileText,
+          label: 'New Doc Page',
+          onClick: () => setNewDocPageModalOpen(true)
         },
         {
           id: 'new-folder',
@@ -458,6 +480,10 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       if (!doesRequestMatchSearchText(item, searchText)) {
         return null;
       }
+    } else if (isItemADoc(item)) {
+      if (!doesDocMatchSearchText(item, searchText)) {
+        return null;
+      }
     } else {
       if (!doesFolderHaveItemsMatchSearchText(item, searchText)) {
         return null;
@@ -467,11 +493,6 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
 
   const handleDoubleClick = (event) => {
     dispatch(makeTabPermanent({ uid: item.uid }));
-  };
-
-  // Sort items by their "seq" property.
-  const sortItemsBySequence = (items = []) => {
-    return items.sort((a, b) => a.seq - b.seq);
   };
 
   const handleShowInFolder = () => {
@@ -525,9 +546,8 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
     setCreateExampleModalOpen(false);
   };
 
-  const folderItems = sortByNameThenSequence(filter(item.items, (i) => isItemAFolder(i) && !i.isTransient));
-  const requestItems = sortItemsBySequence(filter(item.items, (i) => isItemARequest(i) && !i.isTransient));
-  const showEmptyFolderMessage = isFolder && !hasSearchText && !folderItems?.length && !requestItems?.length;
+  const sidebarChildItems = isFolder ? sortSidebarCollectionChildren(item.items) : [];
+  const showEmptyFolderMessage = isFolder && !hasSearchText && !sidebarChildItems?.length;
 
   const emptyFolderMenuItems = createEmptyStateMenuItems({ dispatch, collection, itemUid: item.uid });
 
@@ -560,7 +580,7 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
 
   const handleCopyItem = () => {
     dispatch(copyRequest(item));
-    const itemType = isFolder ? 'Folder' : 'Request';
+    const itemType = isFolder ? 'Folder' : isItemADoc(item) ? 'Doc page' : 'Request';
     toast.success(`${itemType} copied`);
   };
 
@@ -605,6 +625,9 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       )}
       {newRequestModalOpen && (
         <NewRequest item={item} collectionUid={collectionUid} onClose={() => setNewRequestModalOpen(false)} />
+      )}
+      {newDocPageModalOpen && (
+        <NewDocPage item={item} collectionUid={collectionUid} onClose={() => setNewDocPageModalOpen(false)} />
       )}
       {newFolderModalOpen && (
         <NewFolder item={item} collectionUid={collectionUid} onClose={() => setNewFolderModalOpen(false)} />
@@ -709,13 +732,8 @@ const CollectionItem = ({ item, collectionUid, collectionPathname, searchText })
       </div>
       {!itemIsCollapsed ? (
         <div>
-          {folderItems && folderItems.length
-            ? folderItems.map((i) => {
-                return <CollectionItem key={i.uid} item={i} collectionUid={collectionUid} collectionPathname={collectionPathname} searchText={searchText} />;
-              })
-            : null}
-          {requestItems && requestItems.length
-            ? requestItems.map((i) => {
+          {sidebarChildItems && sidebarChildItems.length
+            ? sidebarChildItems.map((i) => {
                 return <CollectionItem key={i.uid} item={i} collectionUid={collectionUid} collectionPathname={collectionPathname} searchText={searchText} />;
               })
             : null}

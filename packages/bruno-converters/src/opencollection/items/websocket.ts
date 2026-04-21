@@ -9,7 +9,10 @@ import {
   fromOpenCollectionVariables,
   toOpenCollectionVariables,
   fromOpenCollectionActions,
-  toOpenCollectionActions
+  toOpenCollectionActions,
+  fromOpenCollectionMarkdownDocs,
+  toOpenCollectionMarkdownDocs,
+  readOpenCollectionStableId
 } from '../common';
 import type {
   WebSocketRequest,
@@ -63,7 +66,7 @@ export const fromOpenCollectionWebsocketItem = (item: WebSocketRequest): BrunoIt
   };
 
   const brunoItem: BrunoItem = {
-    uid: uuid(),
+    uid: readOpenCollectionStableId(item) ?? uuid(),
     type: 'ws-request',
     name: info.name || 'Untitled Request',
     seq: info.seq || 1,
@@ -78,7 +81,7 @@ export const fromOpenCollectionWebsocketItem = (item: WebSocketRequest): BrunoIt
         res: postResponseVars
       },
       tests: scripts?.tests,
-      docs: item.docs || ''
+      docs: fromOpenCollectionMarkdownDocs(item.docs as string | { content?: string } | null | undefined) || ''
     }
   };
 
@@ -169,8 +172,13 @@ export const toOpenCollectionWebsocketItem = (item: BrunoItem): WebSocketRequest
     ocRequest.runtime = runtime;
   }
 
-  if (request.docs) {
-    ocRequest.docs = request.docs as string;
+  const mdDocs = toOpenCollectionMarkdownDocs(request.docs as string | null | undefined);
+  if (mdDocs) {
+    (ocRequest as { docs?: typeof mdDocs }).docs = mdDocs;
+  }
+
+  if (typeof item.uid === 'string' && item.uid.trim()) {
+    (ocRequest as WebSocketRequest & { id?: string }).id = item.uid.trim();
   }
 
   return ocRequest;

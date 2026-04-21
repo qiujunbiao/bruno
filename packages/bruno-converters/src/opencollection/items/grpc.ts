@@ -9,7 +9,10 @@ import {
   fromOpenCollectionActions,
   toOpenCollectionActions,
   fromOpenCollectionAssertions,
-  toOpenCollectionAssertions
+  toOpenCollectionAssertions,
+  fromOpenCollectionMarkdownDocs,
+  toOpenCollectionMarkdownDocs,
+  readOpenCollectionStableId
 } from '../common';
 import type {
   GrpcRequest,
@@ -66,7 +69,7 @@ export const fromOpenCollectionGrpcItem = (item: GrpcRequest): BrunoItem => {
   const postResponseVars = fromOpenCollectionActions((runtime as { actions?: Parameters<typeof fromOpenCollectionActions>[0] }).actions);
 
   const brunoItem: BrunoItem = {
-    uid: uuid(),
+    uid: readOpenCollectionStableId(item) ?? uuid(),
     type: 'grpc-request',
     name: info.name || 'Untitled Request',
     seq: info.seq || 1,
@@ -86,7 +89,7 @@ export const fromOpenCollectionGrpcItem = (item: GrpcRequest): BrunoItem => {
       },
       assertions: fromOpenCollectionAssertions(runtime.assertions),
       tests: scripts?.tests,
-      docs: ''
+      docs: fromOpenCollectionMarkdownDocs((item as { docs?: string | { content?: string } }).docs) || ''
     }
   };
 
@@ -207,8 +210,13 @@ export const toOpenCollectionGrpcItem = (item: BrunoItem): GrpcRequest => {
     ocRequest.runtime = runtime;
   }
 
-  if (request.docs) {
-    ocRequest.docs = request.docs as string;
+  const mdDocs = toOpenCollectionMarkdownDocs(request.docs as string | null | undefined);
+  if (mdDocs) {
+    (ocRequest as { docs?: typeof mdDocs }).docs = mdDocs;
+  }
+
+  if (typeof item.uid === 'string' && item.uid.trim()) {
+    (ocRequest as GrpcRequest & { id?: string }).id = item.uid.trim();
   }
 
   return ocRequest;

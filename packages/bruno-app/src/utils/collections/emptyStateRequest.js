@@ -1,6 +1,6 @@
 import React from 'react';
-import { IconApi, IconBrandGraphql, IconPlugConnected, IconCode } from '@tabler/icons';
-import { newHttpRequest, newWsRequest, newGrpcRequest } from 'providers/ReduxStore/slices/collections/actions';
+import { IconApi, IconBrandGraphql, IconPlugConnected, IconCode, IconFileText } from '@tabler/icons';
+import { newHttpRequest, newWsRequest, newGrpcRequest, newDocPage } from 'providers/ReduxStore/slices/collections/actions';
 import { generateUniqueRequestName } from 'utils/collections';
 import { sanitizeName } from 'utils/common/regex';
 import { formatIpcError } from 'utils/common/error';
@@ -20,6 +20,15 @@ const createRequest = async ({ dispatch, collection, itemUid, requestType }) => 
     };
 
     switch (requestType) {
+      case 'doc':
+        await dispatch(newDocPage({
+          name: uniqueName,
+          filename,
+          collectionUid: collection.uid,
+          itemUid,
+          docs: `# ${uniqueName}\n\n## Overview\n\n`
+        }));
+        break;
       case 'http':
         await dispatch(newHttpRequest({ ...baseParams, requestType: 'http-request', requestMethod: 'GET' }));
         break;
@@ -55,6 +64,12 @@ export const createEmptyStateMenuItems = ({ dispatch, collection, itemUid }) => 
   };
 
   return [
+    {
+      id: 'doc',
+      label: 'Doc Page',
+      leftSection: <IconFileText size={16} strokeWidth={2} />,
+      onClick: handleCreate('doc')
+    },
     {
       id: 'http',
       label: 'HTTP',

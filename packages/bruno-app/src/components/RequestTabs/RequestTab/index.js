@@ -37,6 +37,7 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
   const [showConfirmFolderClose, setShowConfirmFolderClose] = useState(false);
   const [showConfirmEnvironmentClose, setShowConfirmEnvironmentClose] = useState(false);
   const [showConfirmGlobalEnvironmentClose, setShowConfirmGlobalEnvironmentClose] = useState(false);
+  const [showConfirmDocClose, setShowConfirmDocClose] = useState(false);
 
   const menuDropdownRef = useRef();
 
@@ -158,6 +159,7 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
   const specialTabs = [
     'collection-overview',
     'collection-settings',
+    'doc',
     'folder-settings',
     'variables',
     'collection-runner',
@@ -171,6 +173,7 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
   ];
 
   const hasDraft = tab.type === 'collection-settings' && collection?.draft;
+  const hasDocDraft = tab.type === 'doc' && item?.draft;
   const hasFolderDraft = tab.type === 'folder-settings' && folder?.draft;
   const hasEnvironmentDraft = tab.type === 'environment-settings' && collection?.environmentsDraft;
   const globalEnvironmentDraft = useSelector((state) => state.globalEnvironments.globalEnvironmentDraft);
@@ -214,11 +217,17 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
       } else {
         dispatch(closeTabs({ tabUids: [tab.uid] }));
       }
+    } else if (tab.type === 'doc') {
+      if (hasDocDraft) {
+        setShowConfirmDocClose(true);
+      } else {
+        dispatch(closeTabs({ tabUids: [tab.uid] }));
+      }
     } else {
       dispatch(closeTabs({ tabUids: [tab.uid] }));
     }
     return false;
-  }, { enabled: isActive, deps: [isActive, tab, hasChanges, item, collection, folder, globalEnvironmentDraft] });
+  }, { enabled: isActive, deps: [isActive, tab, hasChanges, item, collection, folder, globalEnvironmentDraft, hasDocDraft] });
 
   // Save shortcut — tab-type-aware, only active for the focused tab
   useKeybinding('save', () => {
@@ -268,12 +277,34 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
     setShowConfirmGlobalEnvironmentClose(true);
   };
 
+  const handleCloseDocTab = (event) => {
+    if (!hasDocDraft) {
+      return handleCloseClick(event);
+    }
+
+    event.stopPropagation();
+    event.preventDefault();
+    setShowConfirmDocClose(true);
+  };
+
+  const handleSpecialTabMouseUp = (e) => {
+    if (e.button === 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (tab.type === 'doc' && hasDocDraft) {
+        setShowConfirmDocClose(true);
+        return;
+      }
+      dispatch(closeTabs({ tabUids: [tab.uid] }));
+    }
+  };
+
   if (specialTabs.includes(tab.type)) {
     return (
       <StyledWrapper
         className={`flex items-center justify-between tab-container px-2 ${tab.preview ? 'italic' : ''}`}
         onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
+        onMouseUp={handleSpecialTabMouseUp}
       >
         {showConfirmCollectionClose && tab.type === 'collection-settings' && (
           <ConfirmCollectionClose
@@ -432,12 +463,39 @@ const RequestTab = ({ tab, collection, tabIndex, collectionRequestTabs, folderUi
             }}
           />
         )}
+        {showConfirmDocClose && tab.type === 'doc' && item && (
+          <ConfirmRequestClose
+            item={item}
+            entityKind="doc page"
+            onCancel={() => setShowConfirmDocClose(false)}
+            onCloseWithoutSave={() => {
+              dispatch(deleteRequestDraft({
+                itemUid: item.uid,
+                collectionUid: collection.uid
+              }));
+              dispatch(closeTabs({ tabUids: [tab.uid] }));
+              setShowConfirmDocClose(false);
+            }}
+            onSaveAndClose={() => {
+              dispatch(saveRequest(item.uid, collection.uid))
+                .then(() => {
+                  dispatch(closeTabs({ tabUids: [tab.uid] }));
+                  setShowConfirmDocClose(false);
+                })
+                .catch((err) => {
+                  console.log('err', err);
+                });
+            }}
+          />
+        )}
         {tab.type === 'folder-settings' && !folder ? (
           <RequestTabNotFound handleCloseClick={handleCloseClick} />
         ) : tab.type === 'folder-settings' ? (
           <SpecialTab handleCloseClick={handleCloseFolderSettings} handleDoubleClick={() => dispatch(makeTabPermanent({ uid: tab.uid }))} type={tab.type} tabName={folder?.name} hasDraft={hasFolderDraft} />
         ) : tab.type === 'collection-settings' ? (
           <SpecialTab handleCloseClick={handleCloseCollectionSettings} handleDoubleClick={() => dispatch(makeTabPermanent({ uid: tab.uid }))} type={tab.type} tabName={collection?.name} hasDraft={hasDraft} />
+        ) : tab.type === 'doc' ? (
+          <SpecialTab handleCloseClick={handleCloseDocTab} handleDoubleClick={() => dispatch(makeTabPermanent({ uid: tab.uid }))} type={tab.type} tabName={item?.name} hasDraft={hasDocDraft} />
         ) : tab.type === 'environment-settings' ? (
           <SpecialTab handleCloseClick={handleCloseEnvironmentSettings} handleDoubleClick={() => dispatch(makeTabPermanent({ uid: tab.uid }))} type={tab.type} hasDraft={hasEnvironmentDraft} />
         ) : tab.type === 'global-environment-settings' ? (

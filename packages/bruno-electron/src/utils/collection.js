@@ -447,6 +447,12 @@ const parseBruFileMeta = (data) => {
         requestType = 'http-request';
       } else if (requestType === 'graphql') {
         requestType = 'graphql-request';
+      } else if (requestType === 'grpc') {
+        requestType = 'grpc-request';
+      } else if (requestType === 'ws') {
+        requestType = 'ws-request';
+      } else if (requestType === 'doc') {
+        requestType = 'doc';
       } else {
         requestType = 'http-request';
       }
@@ -457,20 +463,26 @@ const parseBruFileMeta = (data) => {
         name: metaJson.name,
         seq: !isNaN(sequence) ? Number(sequence) : 1,
         settings: {},
-        tags: metaJson.tags || [],
-        request: {
-          method: '',
-          url: '',
-          params: [],
-          headers: [],
-          auth: { mode: 'none' },
-          body: { mode: 'none' },
-          script: {},
-          vars: {},
-          assertions: [],
-          tests: '',
-          docs: ''
-        }
+        tags: metaJson.tags || []
+      };
+
+      if (requestType === 'doc') {
+        transformedJson.docs = '';
+        return transformedJson;
+      }
+
+      transformedJson.request = {
+        method: '',
+        url: '',
+        params: [],
+        headers: [],
+        auth: { mode: 'none' },
+        body: { mode: 'none' },
+        script: {},
+        vars: {},
+        assertions: [],
+        tests: '',
+        docs: ''
       };
 
       return transformedJson;
@@ -490,12 +502,11 @@ const parseYmlFileMeta = (data) => {
     const yaml = require('js-yaml');
     const parsed = yaml.load(data);
 
-    if (!parsed || !parsed.meta) {
-      console.log('No "meta" section found in YAML file.');
+    const metaJson = parsed?.info || parsed?.meta;
+    if (!parsed || !metaJson) {
+      console.log('No "info" or "meta" section found in YAML file.');
       return null;
     }
-
-    const metaJson = parsed.meta;
 
     // Transform to the format expected by bruno-app
     let requestType = metaJson.type;
@@ -503,7 +514,8 @@ const parseYmlFileMeta = (data) => {
       http: 'http-request',
       graphql: 'graphql-request',
       grpc: 'grpc-request',
-      ws: 'ws-request'
+      ws: 'ws-request',
+      doc: 'doc'
     };
     requestType = typeMap[requestType] || 'http-request';
 
@@ -513,20 +525,26 @@ const parseYmlFileMeta = (data) => {
       name: metaJson.name,
       seq: !isNaN(sequence) ? Number(sequence) : 1,
       settings: {},
-      tags: metaJson.tags || [],
-      request: {
-        method: '',
-        url: '',
-        params: [],
-        headers: [],
-        auth: { mode: 'none' },
-        body: { mode: 'none' },
-        script: {},
-        vars: {},
-        assertions: [],
-        tests: '',
-        docs: ''
-      }
+      tags: metaJson.tags || []
+    };
+
+    if (requestType === 'doc') {
+      transformedJson.docs = typeof parsed.docs === 'string' ? parsed.docs : '';
+      return transformedJson;
+    }
+
+    transformedJson.request = {
+      method: '',
+      url: '',
+      params: [],
+      headers: [],
+      auth: { mode: 'none' },
+      body: { mode: 'none' },
+      script: {},
+      vars: {},
+      assertions: [],
+      tests: '',
+      docs: ''
     };
 
     return transformedJson;
@@ -549,6 +567,10 @@ const hydrateRequestWithUuid = (request, pathname) => {
   request.uid = getRequestUid(pathname);
   const prefix = path.join(os.tmpdir(), 'bruno-');
   request.isTransient = pathname.startsWith(prefix);
+
+  if (request.type === 'doc') {
+    return request;
+  }
 
   const params = get(request, 'request.params', []);
   const headers = get(request, 'request.headers', []);
@@ -608,6 +630,17 @@ const replaceTabsWithSpaces = (str, numSpaces = 2) => {
 
 const transformRequestToSaveToFilesystem = (item) => {
   const _item = item.draft ? item.draft : item;
+
+  if (_item.type === 'doc') {
+    return {
+      uid: _item.uid,
+      type: 'doc',
+      name: _item.name,
+      seq: _item.seq,
+      docs: _item.docs || ''
+    };
+  }
+
   const itemToSave = {
     uid: _item.uid,
     type: _item.type,
@@ -683,32 +716,45 @@ const transformRequestToSaveToFilesystem = (item) => {
   return itemToSave;
 };
 
+const isValidDirectorySeqElectron = (seq) =>
+  Number.isFinite(seq) && Number.isInteger(seq) && seq > 0;
+
+/** Align main-process tree order with the app sidebar (folder / doc / request by seq). */
+const sortDirectoryItemsBySequenceElectron = (items = []) => {
+  if (!items.length) {
+    return [];
+  }
+  return [...items]
+    .map((item, originalIndex) => ({ item, originalIndex }))
+    .sort((a, b) => {
+      const aSeq = isValidDirectorySeqElectron(a.item.seq) ? a.item.seq : Number.MAX_SAFE_INTEGER;
+      const bSeq = isValidDirectorySeqElectron(b.item.seq) ? b.item.seq : Number.MAX_SAFE_INTEGER;
+      if (aSeq !== bSeq) {
+        return aSeq - bSeq;
+      }
+      const nameCmp = String(a.item.name ?? '').localeCompare(String(b.item.name ?? ''));
+      if (nameCmp !== 0) {
+        return nameCmp;
+      }
+      return a.originalIndex - b.originalIndex;
+    })
+    .map(({ item }) => item);
+};
+
 const sortCollection = (collection) => {
   const items = collection.items || [];
-  let folderItems = filter(items, (item) => item.type === 'folder');
-  let requestItems = filter(items, (item) => item.type !== 'folder');
+  collection.items = sortDirectoryItemsBySequenceElectron([...items]);
 
-  folderItems = sortByNameThenSequence(folderItems);
-  requestItems = requestItems.sort((a, b) => a.seq - b.seq);
-
-  collection.items = folderItems.concat(requestItems);
-
-  each(folderItems, (item) => {
+  each(collection.items.filter((item) => item.type === 'folder'), (item) => {
     sortCollection(item);
   });
 };
 
 const sortFolder = (folder = {}) => {
   const items = folder.items || [];
-  let folderItems = filter(items, (item) => item.type === 'folder');
-  let requestItems = filter(items, (item) => item.type !== 'folder');
+  folder.items = sortDirectoryItemsBySequenceElectron([...items]);
 
-  folderItems = sortByNameThenSequence(folderItems);
-  requestItems = requestItems.sort((a, b) => a.seq - b.seq);
-
-  folder.items = folderItems.concat(requestItems);
-
-  each(folderItems, (item) => {
+  each(folder.items.filter((item) => item.type === 'folder'), (item) => {
     sortFolder(item);
   });
 

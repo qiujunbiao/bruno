@@ -1401,7 +1401,7 @@ const registerRendererEventHandlers = (mainWindow, watcher) => {
           }
           const content = await stringifyFolder(folderJsonData, { format });
           await writeFile(folderRootPath, content);
-        } else if (REQUEST_TYPES.includes(item?.type)) {
+        } else if (REQUEST_TYPES.includes(item?.type) || item?.type === 'doc') {
           if (fs.existsSync(item.pathname)) {
             const itemToSave = transformRequestToSaveToFilesystem(item);
             const content = await stringifyRequestViaWorker(itemToSave, { format });

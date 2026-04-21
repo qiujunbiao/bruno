@@ -67,12 +67,22 @@ const workspaceWatcher = new WorkspaceWatcher();
 const apiSpecWatcher = new ApiSpecWatcher();
 
 // Reference: https://content-security-policy.com/
+// In dev the renderer is served from Rsbuild on localhost. React refresh / HMR inject
+// short inline scripts; a strict script-src would block them and break the app
+// ("@vitejs/plugin-react can't detect preamble" in the console).
+const connectSrc = isDev
+  ? 'connect-src \'self\' https://*.posthog.com http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:* wss://127.0.0.1:* wss://localhost:*'
+  : 'connect-src \'self\' https://*.posthog.com';
+const scriptSrc = isDev
+  ? 'script-src \'self\' data: \'unsafe-inline\' \'unsafe-eval\''
+  : 'script-src \'self\' data:';
+
 const contentSecurityPolicy = [
   'default-src \'self\'',
-  'connect-src \'self\' https://*.posthog.com',
+  connectSrc,
   'font-src \'self\' https: data:;',
   'frame-src data:',
-  'script-src \'self\' data:',
+  scriptSrc,
   // this has been commented out to make oauth2 work
   // "form-action 'none'",
   // we make an exception and allow http for images so that

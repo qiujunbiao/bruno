@@ -46,11 +46,12 @@ describe('resetSequencesInFolder', () => {
     };
 
     const fixedFolder = resetSequencesInFolder(folder.items);
+    // Valid seq first (1, then 7); items without seq follow, in original order
     expect(fixedFolder).toEqual([
       { uid: '1', seq: 1 },
-      { uid: '2', seq: 2, type: 'folder' },
-      { uid: '3', seq: 3, type: 'folder' },
-      { uid: '4', seq: 4 }
+      { uid: '4', seq: 2 },
+      { uid: '2', seq: 3, type: 'folder' },
+      { uid: '3', seq: 4, type: 'folder' }
     ]);
   });
 

@@ -1,0 +1,55 @@
+info:
+  name: 停用选项集
+  type: http
+  seq: 4
+  tags:
+    - 选项集
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/v3/app/optionsets/:optionset_id"
+  headers:
+    - name: HAP-Appkey
+      value: "{{apiKey}}"
+      description: HAP应用密钥
+  params:
+    - name: optionset_id
+      value: ""
+      type: path
+  auth:
+    type: apikey
+    key: HAP-Appkey
+    value: "{{apiKey}}"
+    placement: header
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Successful response
+    request:
+      url: "{{baseUrl}}/v3/app/optionsets/:optionset_id"
+      method: DELETE
+      headers:
+        - name: HAP-Appkey
+          value: "{{apiKey}}"
+          description: HAP应用密钥
+      params:
+        - name: optionset_id
+          value: ""
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: "{}"
+
+docs: 停用选项集

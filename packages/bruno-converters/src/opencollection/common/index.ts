@@ -6,3 +6,5 @@ export { fromOpenCollectionVariables, toOpenCollectionVariables } from './variab
 export { fromOpenCollectionActions, toOpenCollectionActions } from './actions';
 export { fromOpenCollectionScripts, toOpenCollectionScripts } from './scripts';
 export { fromOpenCollectionAssertions, toOpenCollectionAssertions } from './assertions';
+export { fromOpenCollectionMarkdownDocs, toOpenCollectionMarkdownDocs } from './documentation';
+export { readOpenCollectionStableId } from './stable-id';

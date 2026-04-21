@@ -15,7 +15,8 @@ import {
   findItemInCollection,
   findItemInCollectionByPathname,
   isItemAFolder,
-  isItemARequest
+  isItemARequest,
+  isItemADoc
 } from 'utils/collections';
 import { parsePathParams, splitOnFirst } from 'utils/url';
 import { getSubdirectoriesFromRoot } from 'utils/common/platform';
@@ -760,7 +761,11 @@ export const collectionsSlice = createSlice({
         const item = findItemInCollection(collection, action.payload.itemUid);
 
         if (item && item.draft) {
-          item.request = item.draft.request;
+          if (isItemADoc(item)) {
+            item.docs = item.draft.docs;
+          } else {
+            item.request = item.draft.request;
+          }
           if (item.draft.settings) {
             item.settings = item.draft.settings;
           }
@@ -2714,7 +2719,12 @@ export const collectionsSlice = createSlice({
             currentItem.type = file.data.type;
             currentItem.seq = file.data.seq;
             currentItem.tags = file.data.tags;
-            currentItem.request = mergeRequestWithPreservedUids(currentItem.request, file.data.request);
+            if (isItemADoc(file.data)) {
+              currentItem.docs = file.data.docs || '';
+              delete currentItem.request;
+            } else {
+              currentItem.request = mergeRequestWithPreservedUids(currentItem.request, file.data.request);
+            }
             currentItem.filename = file.meta.name;
             currentItem.pathname = file.meta.pathname;
             currentItem.settings = file.data.settings;
@@ -2732,7 +2742,7 @@ export const collectionsSlice = createSlice({
               type: file.data.type,
               seq: file.data.seq,
               tags: file.data.tags,
-              request: file.data.request,
+              ...(isItemADoc(file.data) ? { docs: file.data.docs || '' } : { request: file.data.request }),
               settings: file.data.settings,
               examples: file.data.examples,
               filename: file.meta.name,
@@ -2833,7 +2843,12 @@ export const collectionsSlice = createSlice({
             item.type = file.data.type;
             item.seq = file.data.seq;
             item.tags = file.data.tags;
-            item.request = mergeRequestWithPreservedUids(item.request, file.data.request);
+            if (isItemADoc(file.data)) {
+              item.docs = file.data.docs || '';
+              delete item.request;
+            } else {
+              item.request = mergeRequestWithPreservedUids(item.request, file.data.request);
+            }
             item.settings = file.data.settings;
             item.examples = file.data.examples;
             item.filename = file.meta.name;
@@ -3192,6 +3207,17 @@ export const collectionsSlice = createSlice({
           }
           item.draft.request.docs = action.payload.docs;
         }
+      }
+    },
+    updateDocPageDocs: (state, action) => {
+      const collection = findCollectionByUid(state.collections, action.payload.collectionUid);
+      const item = collection ? findItemInCollection(collection, action.payload.itemUid) : null;
+
+      if (item && isItemADoc(item)) {
+        if (!item.draft) {
+          item.draft = cloneDeep(item);
+        }
+        item.draft.docs = action.payload.docs;
       }
     },
     updateFolderDocs: (state, action) => {
@@ -3719,6 +3745,7 @@ export const {
   updateRunnerTagsDetails,
   updateRunnerConfiguration,
   updateRequestDocs,
+  updateDocPageDocs,
   updateFolderDocs,
   moveCollection,
   streamDataReceived,

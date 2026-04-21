@@ -9,7 +9,8 @@ export type ItemType
     | 'folder'
     | 'js'
     | 'grpc-request'
-    | 'ws-request';
+    | 'ws-request'
+    | 'doc';
 
 export interface HttpItemSettings {
   encodeUrl?: boolean | null;
@@ -39,6 +40,7 @@ export interface Item {
   root?: FolderRoot | null;
   items?: Item[] | null;
   examples?: Example[] | null;
+  docs?: string | null;
   filename?: string | null;
   pathname?: string | null;
 }

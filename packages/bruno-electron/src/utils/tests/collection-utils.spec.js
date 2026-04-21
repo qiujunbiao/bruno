@@ -213,4 +213,24 @@ describe('transformRequestToSaveToFilesystem', () => {
     // Verify tags are preserved for gRPC requests
     expect(result.tags).toEqual(['grpc', 'microservice']);
   });
+
+  it('should transform doc page items without a request payload', () => {
+    const docItem = {
+      uid: 'doc-uid-1',
+      type: 'doc',
+      name: 'Readme',
+      seq: 2,
+      docs: '# Title\n\nBody'
+    };
+
+    const result = transformRequestToSaveToFilesystem(docItem);
+
+    expect(result).toEqual({
+      uid: 'doc-uid-1',
+      type: 'doc',
+      name: 'Readme',
+      seq: 2,
+      docs: '# Title\n\nBody'
+    });
+  });
 });

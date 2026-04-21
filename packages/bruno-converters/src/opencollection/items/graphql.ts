@@ -15,7 +15,10 @@ import {
   fromOpenCollectionActions,
   toOpenCollectionActions,
   fromOpenCollectionAssertions,
-  toOpenCollectionAssertions
+  toOpenCollectionAssertions,
+  fromOpenCollectionMarkdownDocs,
+  toOpenCollectionMarkdownDocs,
+  readOpenCollectionStableId
 } from '../common';
 import type {
   GraphQLRequest,
@@ -53,7 +56,7 @@ export const fromOpenCollectionGraphqlItem = (item: GraphQLRequest): BrunoItem =
   const postResponseVars = fromOpenCollectionActions(runtime.actions);
 
   const brunoItem: BrunoItem = {
-    uid: uuid(),
+    uid: readOpenCollectionStableId(item) ?? uuid(),
     type: 'graphql-request',
     name: info.name || 'Untitled Request',
     seq: info.seq || 1,
@@ -71,7 +74,7 @@ export const fromOpenCollectionGraphqlItem = (item: GraphQLRequest): BrunoItem =
       },
       assertions: fromOpenCollectionAssertions(runtime.assertions),
       tests: scripts?.tests,
-      docs: item.docs || ''
+      docs: fromOpenCollectionMarkdownDocs(item.docs as string | { content?: string } | null | undefined) || ''
     }
   };
 
@@ -185,8 +188,13 @@ export const toOpenCollectionGraphqlItem = (item: BrunoItem): GraphQLRequest => 
   };
   ocRequest.settings = settings;
 
-  if (request.docs) {
-    ocRequest.docs = request.docs as string;
+  const mdDocs = toOpenCollectionMarkdownDocs(request.docs as string | null | undefined);
+  if (mdDocs) {
+    (ocRequest as { docs?: typeof mdDocs }).docs = mdDocs;
+  }
+
+  if (typeof item.uid === 'string' && item.uid.trim()) {
+    (ocRequest as GraphQLRequest & { id?: string }).id = item.uid.trim();
   }
 
   return ocRequest;

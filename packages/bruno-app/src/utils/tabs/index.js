@@ -8,6 +8,10 @@ export const isItemAFolder = (item) => {
   return !item.hasOwnProperty('request') && item.type === 'folder';
 };
 
+export const isItemADoc = (item) => {
+  return !item.hasOwnProperty('request') && item.type === 'doc';
+};
+
 export const itemIsOpenedInTabs = (item, tabs) => {
   return find(tabs, (t) => t.uid === item.uid);
 };

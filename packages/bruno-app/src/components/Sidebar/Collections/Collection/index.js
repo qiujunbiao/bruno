@@ -9,6 +9,7 @@ import {
   IconDots,
   IconLoader2,
   IconFilePlus,
+  IconFileText,
   IconFolderPlus,
   IconCopy,
   IconClipboard,
@@ -31,10 +32,11 @@ import { setFocusedSidebarPath } from 'providers/ReduxStore/slices/app';
 import toast from 'react-hot-toast';
 import NewRequest from 'components/Sidebar/NewRequest';
 import NewFolder from 'components/Sidebar/NewFolder';
+import NewDocPage from 'components/Sidebar/NewDocPage';
 import CollectionItem from './CollectionItem';
 import RemoveCollection from './RemoveCollection';
 import { doesCollectionHaveItemsMatchingSearchText } from 'utils/collections/search';
-import { isItemAFolder, isItemARequest, areItemsLoading } from 'utils/collections';
+import { areItemsLoading, sortSidebarCollectionChildren } from 'utils/collections';
 import { isTabForItemActive } from 'src/selectors/tab';
 
 import RenameCollection from './RenameCollection';
@@ -44,7 +46,6 @@ import { scrollToTheActiveTab } from 'utils/tabs';
 import ShareCollection from 'components/ShareCollection/index';
 import GenerateDocumentation from './GenerateDocumentation';
 import { CollectionItemDragPreview } from './CollectionItem/CollectionItemDragPreview/index';
-import { sortByNameThenSequence } from 'utils/common/index';
 import { getRevealInFolderLabel } from 'utils/common/platform';
 import { openDevtoolsAndSwitchToTerminal } from 'utils/terminal';
 import ActionIcon from 'ui/ActionIcon';
@@ -64,6 +65,7 @@ const Collection = ({ collection, searchText }) => {
   const { dropdownContainerRef } = useSidebarAccordion();
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [showNewRequestModal, setShowNewRequestModal] = useState(false);
+  const [showNewDocPageModal, setShowNewDocPageModal] = useState(false);
   const [showRenameCollectionModal, setShowRenameCollectionModal] = useState(false);
   const [showCloneCollectionModalOpen, setShowCloneCollectionModalOpen] = useState(false);
   const [showShareCollectionModal, setShowShareCollectionModal] = useState(false);
@@ -316,13 +318,7 @@ const Collection = ({ collection, searchText }) => {
     'collection-keyboard-focused': isKeyboardFocused
   });
 
-  // we need to sort request items by seq property
-  const sortItemsBySequence = (items = []) => {
-    return items.sort((a, b) => a.seq - b.seq);
-  };
-
-  const requestItems = sortItemsBySequence(filter(collection.items, (i) => isItemARequest(i) && !i.isTransient));
-  const folderItems = sortByNameThenSequence(filter(collection.items, (i) => isItemAFolder(i) && !i.isTransient));
+  const sidebarChildItems = sortSidebarCollectionChildren(collection.items);
   const showEmptyCollectionMessage = showEmptyState && !hasSearchText;
 
   const emptyStateMenuItems = createEmptyStateMenuItems({ dispatch, collection, itemUid: null });
@@ -335,6 +331,15 @@ const Collection = ({ collection, searchText }) => {
       onClick: () => {
         ensureCollectionIsMounted();
         setShowNewRequestModal(true);
+      }
+    },
+    {
+      id: 'new-doc-page',
+      leftSection: IconFileText,
+      label: 'New Doc Page',
+      onClick: () => {
+        ensureCollectionIsMounted();
+        setShowNewDocPageModal(true);
       }
     },
     {
@@ -451,6 +456,7 @@ const Collection = ({ collection, searchText }) => {
   return (
     <StyledWrapper className="flex flex-col" id={`collection-${collection.name.replace(/\s+/g, '-').toLowerCase()}`}>
       {showNewRequestModal && <NewRequest collectionUid={collection.uid} onClose={() => setShowNewRequestModal(false)} />}
+      {showNewDocPageModal && <NewDocPage collectionUid={collection.uid} onClose={() => setShowNewDocPageModal(false)} />}
       {showNewFolderModal && <NewFolder collectionUid={collection.uid} onClose={() => setShowNewFolderModal(false)} />}
       {showRenameCollectionModal && (
         <RenameCollection collectionUid={collection.uid} onClose={() => setShowRenameCollectionModal(false)} />
@@ -520,10 +526,7 @@ const Collection = ({ collection, searchText }) => {
       <div>
         {!collectionIsCollapsed ? (
           <div>
-            {folderItems?.map?.((i) => {
-              return <CollectionItem key={i.uid} item={i} collectionUid={collection.uid} collectionPathname={collection.pathname} searchText={searchText} />;
-            })}
-            {requestItems?.map?.((i) => {
+            {sidebarChildItems?.map?.((i) => {
               return <CollectionItem key={i.uid} item={i} collectionUid={collection.uid} collectionPathname={collection.pathname} searchText={searchText} />;
             })}
             {showEmptyCollectionMessage ? (

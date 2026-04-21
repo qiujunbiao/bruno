@@ -7,7 +7,8 @@ import {
   fromOpenCollectionScripts,
   toOpenCollectionScripts,
   fromOpenCollectionVariables,
-  toOpenCollectionVariables
+  toOpenCollectionVariables,
+  readOpenCollectionStableId
 } from './common';
 import { fromOpenCollectionItems, toOpenCollectionItems } from './items';
 import type {
@@ -24,7 +25,7 @@ export const fromOpenCollectionFolder = (folder: Folder): BrunoItem => {
   const info = folder.info || {};
 
   const brunoFolder: BrunoItem = {
-    uid: uuid(),
+    uid: readOpenCollectionStableId(folder) ?? uuid(),
     type: 'folder',
     name: info.name || 'Untitled Folder',
     seq: info.seq || 1
@@ -129,6 +130,10 @@ export const toOpenCollectionFolder = (folder: BrunoItem): Folder => {
 
   if (folder.items?.length) {
     ocFolder.items = toOpenCollectionItems(folder.items, toOpenCollectionFolder as (f: BrunoItem) => unknown) as Folder['items'];
+  }
+
+  if (typeof folder.uid === 'string' && folder.uid.trim()) {
+    (ocFolder as Folder & { id?: string }).id = folder.uid.trim();
   }
 
   return ocFolder;

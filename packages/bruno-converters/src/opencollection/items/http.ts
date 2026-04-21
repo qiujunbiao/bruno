@@ -15,7 +15,10 @@ import {
   fromOpenCollectionActions,
   toOpenCollectionActions,
   fromOpenCollectionAssertions,
-  toOpenCollectionAssertions
+  toOpenCollectionAssertions,
+  fromOpenCollectionMarkdownDocs,
+  toOpenCollectionMarkdownDocs,
+  readOpenCollectionStableId
 } from '../common';
 import type {
   HttpRequest,
@@ -83,11 +86,11 @@ export const fromOpenCollectionHttpItem = (ocRequest: HttpRequest): BrunoItem =>
     },
     assertions: fromOpenCollectionAssertions(runtime?.assertions) || [],
     tests: scripts?.tests || null,
-    docs: ocRequest.docs || null
+    docs: fromOpenCollectionMarkdownDocs(ocRequest.docs as string | { content?: string } | null | undefined) || null
   };
 
   const brunoItem: BrunoItem = {
-    uid: uuid(),
+    uid: readOpenCollectionStableId(ocRequest) ?? uuid(),
     type: 'http-request',
     seq: info?.seq || 1,
     name: info?.name || 'Untitled Request',
@@ -227,8 +230,13 @@ export const toOpenCollectionHttpItem = (item: BrunoItem): HttpRequest => {
   };
   ocRequest.settings = settings;
 
-  if (brunoRequest?.docs) {
-    ocRequest.docs = brunoRequest.docs;
+  const mdDocs = toOpenCollectionMarkdownDocs(brunoRequest?.docs as string | null | undefined);
+  if (mdDocs) {
+    (ocRequest as { docs?: typeof mdDocs }).docs = mdDocs;
+  }
+
+  if (typeof item.uid === 'string' && item.uid.trim()) {
+    (ocRequest as HttpRequest & { id?: string }).id = item.uid.trim();
   }
 
   if (item.examples?.length) {

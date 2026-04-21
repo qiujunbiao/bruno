@@ -41,6 +41,7 @@ import EnvironmentSettings from 'components/Environments/EnvironmentSettings';
 import GlobalEnvironmentSettings from 'components/Environments/GlobalEnvironmentSettings';
 import OpenAPISyncTab from 'components/OpenAPISyncTab';
 import OpenAPISpecTab from 'components/OpenAPISpecTab';
+import DocPage from 'components/DocPage';
 
 const MIN_LEFT_PANE_WIDTH = 300;
 const MIN_RIGHT_PANE_WIDTH = 490;
@@ -232,6 +233,13 @@ const RequestTabPanel = () => {
   const item = findItemInCollection(collection, activeTabUid);
   const isGrpcRequest = item?.type === 'grpc-request';
   const isWsRequest = item?.type === 'ws-request';
+
+  if (focusedTab.type === 'doc' || item?.type === 'doc') {
+    if (!item || !item.uid) {
+      return <RequestNotFound itemUid={activeTabUid} />;
+    }
+    return <DocPage item={item} collection={collection} />;
+  }
 
   if (focusedTab.type === 'collection-runner') {
     return <RunnerResults collection={collection} />;

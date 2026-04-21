@@ -1,0 +1,89 @@
+info:
+  name: 知识库检索
+  type: http
+  seq: 2
+  tags:
+    - 知识库
+
+http:
+  method: POST
+  url: "{{baseUrl}}/v3/app/knowledge/search"
+  headers:
+    - name: HAP-Appkey
+      value: "{{apiKey}}"
+      description: HAP应用密钥
+  body:
+    type: json
+    data: |-
+      {
+        "knowledgeIds": [
+          ""
+        ],
+        "query": "",
+        "searchMode": "",
+        "topK": 0,
+        "minRelevance": 0,
+        "rrfK": 0,
+        "filter": {
+          "worksheetIds": [
+            ""
+          ],
+          "types": [
+            ""
+          ]
+        }
+      }
+  auth:
+    type: apikey
+    key: HAP-Appkey
+    value: "{{apiKey}}"
+    placement: header
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Successful response
+    request:
+      url: "{{baseUrl}}/v3/app/knowledge/search"
+      method: POST
+      headers:
+        - name: HAP-Appkey
+          value: "{{apiKey}}"
+          description: HAP应用密钥
+      body:
+        type: json
+        data: |-
+          {
+            "knowledgeIds": [
+              ""
+            ],
+            "query": "",
+            "searchMode": "",
+            "topK": 0,
+            "minRelevance": 0,
+            "rrfK": 0,
+            "filter": {
+              "worksheetIds": [
+                ""
+              ],
+              "types": [
+                ""
+              ]
+            }
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: "{}"
+
+docs: 在指定知识库中按查询文本进行检索，支持向量/全文/混合模式

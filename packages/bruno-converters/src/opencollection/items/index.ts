@@ -1,4 +1,5 @@
 import { uuid } from '../../common/index.js';
+import { fromOpenCollectionMarkdownDocs, toOpenCollectionMarkdownDocs, readOpenCollectionStableId } from '../common';
 import { fromOpenCollectionHttpItem, toOpenCollectionHttpItem } from './http';
 import { fromOpenCollectionGraphqlItem, toOpenCollectionGraphqlItem } from './graphql';
 import { fromOpenCollectionGrpcItem, toOpenCollectionGrpcItem } from './grpc';
@@ -68,6 +69,24 @@ export const fromOpenCollectionItem = (item: unknown, parseFolder: (folder: unkn
       return fromOpenCollectionWebsocketItem(item as Parameters<typeof fromOpenCollectionWebsocketItem>[0]);
     case 'folder':
       return parseFolder(item);
+    case 'doc': {
+      const raw = item as {
+        info?: { name?: string; seq?: number };
+        docs?: string | { content?: string };
+        id?: string;
+        uuid?: string;
+      };
+      const docsStr = fromOpenCollectionMarkdownDocs(raw.docs);
+      return {
+        uid: readOpenCollectionStableId(raw) ?? uuid(),
+        type: 'doc',
+        name: raw.info?.name || 'Untitled Doc',
+        seq: raw.info?.seq ?? 1,
+        docs: docsStr,
+        filename: null,
+        pathname: null
+      } as BrunoItem;
+    }
     case 'script': {
       const scriptItem = item as { script?: string; info?: { name?: string } };
       return {
@@ -94,8 +113,22 @@ export const toOpenCollectionItem = (item: BrunoItem, stringifyFolder: (folder: 
       return toOpenCollectionWebsocketItem(item);
     case 'folder':
       return stringifyFolder(item);
+    case 'doc': {
+      const d = item as BrunoItem & { docs?: string };
+      const docPayload = toOpenCollectionMarkdownDocs(d.docs || '') || { content: '', type: 'text/markdown' as const };
+      return {
+        ...(typeof d.uid === 'string' && d.uid.trim() ? { id: d.uid.trim() } : {}),
+        info: {
+          name: d.name || 'Untitled Doc',
+          type: 'doc',
+          ...(typeof d.seq === 'number' ? { seq: d.seq } : {})
+        },
+        docs: docPayload
+      };
+    }
     case 'js':
       return {
+        ...(typeof item.uid === 'string' && item.uid.trim() ? { id: item.uid.trim() } : {}),
         info: {
           name: item.name || 'script.js',
           type: 'script'

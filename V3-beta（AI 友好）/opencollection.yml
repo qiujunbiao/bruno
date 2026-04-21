@@ -1,0 +1,28 @@
+opencollection: 1.0.0
+
+info:
+  name: V3-beta（AI 友好）
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  auth:
+    type: apikey
+    key: HAP-Appkey
+    value: "{{apiKey}}"
+    placement: header
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

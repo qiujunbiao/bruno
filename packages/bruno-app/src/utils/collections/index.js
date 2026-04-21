@@ -1,7 +1,6 @@
 import { cloneDeep, isEqual, sortBy, filter, map, isString, findIndex, find, each, get } from 'lodash';
 import { uuid } from 'utils/common';
 import { buildPersistedEnvVariables } from 'utils/environments';
-import { sortByNameThenSequence } from 'utils/common/index';
 import path from 'utils/common/path';
 import { isRequestTagsIncluded } from '@usebruno/common';
 
@@ -292,7 +291,7 @@ export const transformCollectionToSaveToExportAsFile = (collection, options = {}
 
   const copyItems = (sourceItems, destItems) => {
     each(sourceItems, (si) => {
-      if (!isItemAFolder(si) && !isItemARequest(si) && si.type !== 'js') {
+      if (!isItemAFolder(si) && !isItemARequest(si) && si.type !== 'js' && !isItemADoc(si)) {
         return;
       }
 
@@ -307,12 +306,16 @@ export const transformCollectionToSaveToExportAsFile = (collection, options = {}
         uid: si.uid,
         type: si.type,
         name: si.name,
-        filename: isItemARequest(si) ? normalizeFilenameToBru(si.filename) : si.filename,
+        filename: (isItemARequest(si) || isItemADoc(si)) ? normalizeFilenameToBru(si.filename) : si.filename,
         seq: si.seq,
         settings: si.settings,
         tags: si.tags,
         examples: copyExamples(si.examples || [])
       };
+
+      if (isItemADoc(si)) {
+        di.docs = si.docs || '';
+      }
 
       if (si.request) {
         di.request = {
@@ -590,7 +593,7 @@ export const transformCollectionToSaveToExportAsFile = (collection, options = {}
 
       if (si.items && si.items.length) {
         di.items = [];
-        copyItems(si.items, di.items);
+        copyItems(sortSidebarCollectionChildren(si.items), di.items);
       }
     });
   };
@@ -684,12 +687,22 @@ export const transformCollectionToSaveToExportAsFile = (collection, options = {}
     });
   }
 
-  copyItems(collection.items, collectionToSave.items);
+  copyItems(sortSidebarCollectionChildren(collection.items || []), collectionToSave.items);
   return collectionToSave;
 };
 
 export const transformRequestToSaveToFilesystem = (item) => {
   const _item = item.draft ? item.draft : item;
+
+  if (isItemADoc(_item)) {
+    return {
+      uid: _item.uid,
+      type: 'doc',
+      name: _item.name,
+      seq: _item.seq,
+      docs: _item.docs || ''
+    };
+  }
 
   // Transform examples to ensure status is a number
   const transformExamples = (examples = []) => {
@@ -885,6 +898,10 @@ export const isItemARequest = (item) => {
 
 export const isItemAFolder = (item) => {
   return !item.hasOwnProperty('request') && item.type === 'folder';
+};
+
+export const isItemADoc = (item) => {
+  return !item.hasOwnProperty('request') && item.type === 'doc';
 };
 
 export const humanizeRequestBodyMode = (mode) => {
@@ -1418,13 +1435,49 @@ export const getFormattedCollectionOauth2Credentials = ({ oauth2Credentials = []
 
 // item sequence utils - START
 
+const isValidDirectorySeq = (seq) =>
+  Number.isFinite(seq) && Number.isInteger(seq) && seq > 0;
+
+/**
+ * Sort folder / doc / request siblings for the collection sidebar and for drag-resequence math.
+ * Items without a valid seq sort after those with seq; ties use name then original order.
+ */
+export const sortDirectoryItemsBySequence = (items = []) => {
+  if (!items.length) {
+    return [];
+  }
+  return [...items]
+    .map((item, originalIndex) => ({ item, originalIndex }))
+    .sort((a, b) => {
+      const aSeq = isValidDirectorySeq(a.item.seq) ? a.item.seq : Number.MAX_SAFE_INTEGER;
+      const bSeq = isValidDirectorySeq(b.item.seq) ? b.item.seq : Number.MAX_SAFE_INTEGER;
+      if (aSeq !== bSeq) {
+        return aSeq - bSeq;
+      }
+      const nameCmp = String(a.item.name ?? '').localeCompare(String(b.item.name ?? ''));
+      if (nameCmp !== 0) {
+        return nameCmp;
+      }
+      return a.originalIndex - b.originalIndex;
+    })
+    .map(({ item }) => item);
+};
+
+/** Ordered children shown in the sidebar (folders, doc pages, requests — same order as drag-drop seq). */
+export const sortSidebarCollectionChildren = (items = []) => {
+  const children = filter(
+    items,
+    (i) => !i.isTransient && (isItemAFolder(i) || isItemADoc(i) || isItemARequest(i))
+  );
+  return sortDirectoryItemsBySequence(children);
+};
+
 export const resetSequencesInFolder = (folderItems) => {
-  const items = folderItems;
-  const sortedItems = sortByNameThenSequence(items);
-  return sortedItems.map((item, index) => {
-    item.seq = index + 1;
-    return item;
-  });
+  const sortedItems = sortDirectoryItemsBySequence(folderItems || []);
+  return sortedItems.map((item, index) => ({
+    ...item,
+    seq: index + 1
+  }));
 };
 
 export const isItemBetweenSequences = (itemSequence, sourceItemSequence, targetItemSequence) => {

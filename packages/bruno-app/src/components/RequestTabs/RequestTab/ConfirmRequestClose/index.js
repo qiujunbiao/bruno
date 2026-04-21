@@ -3,10 +3,10 @@ import { IconAlertTriangle } from '@tabler/icons';
 import Modal from 'components/Modal';
 import Button from 'ui/Button';
 
-const ConfirmRequestClose = ({ item, example, onCancel, onCloseWithoutSave, onSaveAndClose }) => {
+const ConfirmRequestClose = ({ item, example, entityKind, onCancel, onCloseWithoutSave, onSaveAndClose }) => {
   const isExample = !!example;
   const itemName = isExample ? example.name : item.name;
-  const itemType = isExample ? 'example' : 'request';
+  const itemType = entityKind || (isExample ? 'example' : 'request');
 
   return (
     <Modal

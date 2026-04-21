@@ -27,8 +27,21 @@ export const parseBruRequest = (data: string | any, parsed: boolean = false): an
       case 'ws':
         requestType = 'ws-request';
         break;
+      case 'doc':
+        requestType = 'doc';
+        break;
       default:
         requestType = 'http-request';
+    }
+
+    if (requestType === 'doc') {
+      const sequence = _.get(json, 'meta.seq');
+      return {
+        type: 'doc',
+        name: _.get(json, 'meta.name'),
+        seq: !_.isNaN(sequence) ? Number(sequence) : 1,
+        docs: _.get(json, 'docs', '')
+      };
     }
 
     const sequence = _.get(json, 'meta.seq');
@@ -131,6 +144,9 @@ export const stringifyBruRequest = (json: any): string => {
       case 'ws-request':
         type = 'ws';
         break;
+      case 'doc':
+        type = 'doc';
+        break;
       default:
         type = 'http';
     }
@@ -146,6 +162,11 @@ export const stringifyBruRequest = (json: any): string => {
         tags: _.get(json, 'tags', [])
       }
     } as any;
+
+    if (type === 'doc') {
+      bruJson.docs = _.get(json, 'docs', '');
+      return jsonToBruV2(bruJson);
+    }
 
     // For HTTP and GraphQL requests, maintain the current structure
     if (type === 'http' || type === 'graphql') {

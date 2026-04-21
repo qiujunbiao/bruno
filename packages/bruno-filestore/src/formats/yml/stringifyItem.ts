@@ -23,6 +23,16 @@ const stringifyItem = (item: BrunoItem): string => {
       case 'js':
         return stringifyScript(item);
 
+      case 'doc':
+        return [
+          'info:',
+          `  name: ${JSON.stringify(item.name || '')}`,
+          '  type: doc',
+          `  seq: ${item.seq || 1}`,
+          'docs: |',
+          ...(String((item as any).docs || '').split('\n').map((line) => `  ${line}`))
+        ].join('\n');
+
       case 'folder':
         throw new Error('Folder items should be handled separately using stringifyFolder');
 

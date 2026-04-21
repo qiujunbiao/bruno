@@ -72,6 +72,15 @@ const parseItem = (ymlString: string): BrunoItem => {
     }
 
     switch (itemType) {
+      case 'doc':
+        return {
+          uid: (ocItem as any).uid,
+          type: 'doc',
+          name: (ocItem as any).info?.name || 'Untitled Doc',
+          seq: Number((ocItem as any).info?.seq || 1),
+          docs: (ocItem as any).docs || ''
+        } as any;
+
       case 'http':
         return parseHttpRequest(ocItem as HttpRequest);
 
