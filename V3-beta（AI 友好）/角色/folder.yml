@@ -1,7 +1,0 @@
-info:
-  name: 角色
-  type: folder
-  seq: 7
-
-request:
-  auth: inherit
