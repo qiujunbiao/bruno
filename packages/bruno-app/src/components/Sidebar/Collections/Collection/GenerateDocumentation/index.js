@@ -194,46 +194,113 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
         }
         #opencollection-container[data-bruno-theme="dark"] {
             /* Match Bruno built-in "Dark" palette (themes/dark/dark.js) */
-            --background-color: hsl(0deg 0% 10%);
-            --bg-primary: hsl(0deg 0% 10%);
-            --bg-secondary: #222224;
-            --oc-sidebar-bg: hsl(0deg 0% 10%);
-            --oc-text-primary: hsl(0deg 0% 80%);
-            --text-primary: hsl(0deg 0% 80%);
-            --text-secondary: #aaa;
-            --text-tertiary: #8f8f8f;
-            --border-color: #333333;
-            --code-bg: #222224;
-            --code-text: hsl(0deg 0% 80%);
-            --table-header-bg: #26292b;
-            --table-row-odd-bg: hsl(0deg 0% 10%);
-            --table-row-even-bg: #1e1e1e;
-            --input-bg: transparent;
-            --badge-bg: #26292b;
-            --badge-text: hsl(0deg 0% 80%);
+            --background-color: #0f1115;
+            --bg-primary: #0f1115;
+            --bg-secondary: #171b22;
+            --bg-elevated: #1e242d;
+            --oc-sidebar-bg: #11141a;
+            --oc-text-primary: #e4e7ec;
+            --text-primary: #e4e7ec;
+            --text-secondary: #b5bdc9;
+            --text-tertiary: #8f9aaa;
+            --border-color: #303744;
+            --code-bg: #111827;
+            --code-text: #dbeafe;
+            --table-header-bg: #1e242d;
+            --table-row-odd-bg: #0f1115;
+            --table-row-even-bg: #151922;
+            --input-bg: #151922;
+            --badge-bg: #1e242d;
+            --badge-text: #e4e7ec;
             --method-get-bg: #1f7a4d;
             --method-post-bg: #1f5a8a;
             --method-put-bg: #8a5a1f;
             --method-patch-bg: #5e3b9d;
             --method-delete-bg: #9d3b3b;
             --method-options-bg: #1f7a73;
+            --bruno-method-get: hsl(140, 72%, 68%);
+            --bruno-method-post: hsl(202, 88%, 72%);
+            --bruno-method-put: hsl(24, 88%, 72%);
+            --bruno-method-delete: hsl(8, 70%, 60%);
+            --bruno-method-patch: hsl(24, 88%, 72%);
+            --bruno-method-options: hsl(170, 70%, 60%);
+            --bruno-method-head: hsl(190, 82%, 72%);
+            --bruno-method-text: #10141c;
+        }
+        #opencollection-container[data-bruno-theme="dark"],
+        #opencollection-container[data-bruno-theme="dark"] > div {
+            background-color: #0f1115 !important;
+            color: #e4e7ec !important;
+        }
+        #opencollection-container[data-bruno-theme="dark"] [class~="bg-white"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="bg-gray-50"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="bg-gray-100"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="bg-slate-50"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="bg-slate-100"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="bg-zinc-50"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="bg-zinc-100"],
+        #opencollection-container[data-bruno-theme="dark"] [style*="background: white"],
+        #opencollection-container[data-bruno-theme="dark"] [style*="background-color: white"],
+        #opencollection-container[data-bruno-theme="dark"] [style*="background: #fff"],
+        #opencollection-container[data-bruno-theme="dark"] [style*="background-color: #fff"],
+        #opencollection-container[data-bruno-theme="dark"] [style*="background: rgb(255, 255, 255)"],
+        #opencollection-container[data-bruno-theme="dark"] [style*="background-color: rgb(255, 255, 255)"] {
+            background-color: #0f1115 !important;
+            color: #e4e7ec !important;
+        }
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-black"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-gray-950"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-gray-900"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-gray-800"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-slate-950"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-slate-900"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-slate-800"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-zinc-950"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-zinc-900"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-zinc-800"] {
+            color: #edf0f4 !important;
+            -webkit-text-fill-color: #edf0f4 !important;
+        }
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-gray-700"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-gray-600"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-gray-500"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-slate-700"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-slate-600"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-slate-500"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-zinc-700"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-zinc-600"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="text-zinc-500"] {
+            color: #b5bdc9 !important;
+            -webkit-text-fill-color: #b5bdc9 !important;
+        }
+        #opencollection-container[data-bruno-theme="dark"] [class~="border-gray-100"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="border-gray-200"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="border-slate-100"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="border-slate-200"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="border-zinc-100"],
+        #opencollection-container[data-bruno-theme="dark"] [class~="border-zinc-200"] {
+            border-color: #303744 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .markdown-body {
-            color: hsl(0deg 0% 80%) !important;
+            color: #e4e7ec !important;
             background: transparent !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar,
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar > div,
         #opencollection-container[data-bruno-theme="dark"] .playground-content,
         #opencollection-container[data-bruno-theme="dark"] .all-endpoints-view {
-            background-color: hsl(0deg 0% 10%) !important;
-            color: hsl(0deg 0% 80%) !important;
+            background-color: #0f1115 !important;
+            color: #e4e7ec !important;
+        }
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar,
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar > div {
+            background-color: #11141a !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar h1 {
-            color: hsl(0deg 0% 80%) !important;
+            color: #edf0f4 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .active {
-            background-color: #2f3236 !important;
+            background-color: #263241 !important;
             color: #ffffff !important;
             box-shadow: inset 3px 0 0 #d9a342;
             font-weight: 600;
@@ -242,16 +309,43 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .item-title,
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .item-subtitle,
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .text-sm {
-            color: hsl(0deg 0% 82%) !important;
+            color: #d7dce4 !important;
+            -webkit-text-fill-color: #d7dce4 !important;
             opacity: 1 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar [style*="padding-left"] {
-            color: hsl(0deg 0% 82%) !important;
+            color: #d7dce4 !important;
+            -webkit-text-fill-color: #d7dce4 !important;
+        }
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar [style*="padding-left"] div:not(.method-badge):not(.bruno-method-badge),
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar [style*="padding-left"] span:not(.method-badge):not(.bruno-method-badge),
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar [style*="padding-left"] p,
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar [style*="padding-left"] a {
+            -webkit-text-fill-color: #d7dce4 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar [style*="padding-left"]:hover {
-            background-color: #222224 !important;
+            background-color: #1a2029 !important;
         }
-        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .method-badge {
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .method-badge,
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .bruno-method-badge {
+            background-color: var(--bruno-method-post) !important;
+            border-color: transparent !important;
+            color: var(--bruno-method-text) !important;
+            -webkit-text-fill-color: var(--bruno-method-text) !important;
+            font-weight: 800 !important;
+            opacity: 1 !important;
+        }
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .method-badge,
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .method-badge *,
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .bruno-method-badge,
+        #opencollection-container[data-bruno-theme="dark"] .playground-sidebar .bruno-method-badge * {
+            text-shadow: none !important;
+            filter: none !important;
+        }
+        #opencollection-container[data-bruno-theme="dark"] .bruno-method-badge {
+            color: var(--bruno-method-text) !important;
+            -webkit-text-fill-color: var(--bruno-method-text) !important;
+            font-weight: 800 !important;
             opacity: 1 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .playground-sidebar,
@@ -261,18 +355,18 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
         }
         #opencollection-container[data-bruno-theme="dark"] .bruno-sidebar-search input,
         #opencollection-container[data-bruno-theme="dark"] .bruno-sidebar-search input[type="search"] {
-            background-color: #222224 !important;
-            color: hsl(0deg 0% 88%) !important;
-            border-color: #444444 !important;
+            background-color: #151922 !important;
+            color: #edf0f4 !important;
+            border-color: #414b5c !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .bruno-sidebar-search input::placeholder {
-            color: #8f8f8f !important;
+            color: #96a0af !important;
             opacity: 1 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .badge-url {
-            background-color: #222224 !important;
-            color: hsl(0deg 0% 88%) !important;
-            border: 1px solid #444444 !important;
+            background-color: #171b22 !important;
+            color: #edf0f4 !important;
+            border: 1px solid #414b5c !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .badge-try {
             background-color: #2a3e57 !important;
@@ -281,9 +375,9 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
         }
         #opencollection-container[data-bruno-theme="dark"] .code-tabs .code-tab,
         #opencollection-container[data-bruno-theme="dark"] .tab-header button {
-            color: #a8a8a8 !important;
+            color: #b5bdc9 !important;
             background-color: transparent !important;
-            border-color: #3a3a3a !important;
+            border-color: #303744 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .code-tabs .code-tab.active,
         #opencollection-container[data-bruno-theme="dark"] .tab-header button.active {
@@ -300,28 +394,28 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
         #opencollection-container[data-bruno-theme="dark"] .compact-code-view,
         #opencollection-container[data-bruno-theme="dark"] .code-header,
         #opencollection-container[data-bruno-theme="dark"] .code-content {
-            background-color: hsl(0deg 0% 10%) !important;
-            color: hsl(0deg 0% 82%) !important;
-            border-color: #333333 !important;
+            background-color: #0f1115 !important;
+            color: #e4e7ec !important;
+            border-color: #303744 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] input,
         #opencollection-container[data-bruno-theme="dark"] select,
         #opencollection-container[data-bruno-theme="dark"] textarea {
-            background-color: #222224 !important;
-            color: hsl(0deg 0% 88%) !important;
-            border-color: #444444 !important;
+            background-color: #151922 !important;
+            color: #edf0f4 !important;
+            border-color: #414b5c !important;
         }
         #opencollection-container[data-bruno-theme="dark"] input::placeholder,
         #opencollection-container[data-bruno-theme="dark"] textarea::placeholder {
-            color: #8f8f8f !important;
+            color: #96a0af !important;
             opacity: 1 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] table tr,
         #opencollection-container[data-bruno-theme="dark"] table td,
         #opencollection-container[data-bruno-theme="dark"] table th {
             background-color: transparent !important;
-            color: hsl(0deg 0% 82%) !important;
-            border-color: #333333 !important;
+            color: #e4e7ec !important;
+            border-color: #303744 !important;
         }
         /* Environment / Global Variables table in Try mode */
         #opencollection-container[data-bruno-theme="dark"] .key-value-table-wrapper,
@@ -330,45 +424,45 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
         #opencollection-container[data-bruno-theme="dark"] .key-value-table tbody,
         #opencollection-container[data-bruno-theme="dark"] .key-value-table tbody tr,
         #opencollection-container[data-bruno-theme="dark"] .key-value-table tbody td {
-            background-color: hsl(0deg 0% 10%) !important;
-            color: hsl(0deg 0% 82%) !important;
-            border-color: #333333 !important;
+            background-color: #0f1115 !important;
+            color: #e4e7ec !important;
+            border-color: #303744 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .key-value-table thead,
         #opencollection-container[data-bruno-theme="dark"] .key-value-table thead th {
-            background-color: #222224 !important;
-            color: hsl(0deg 0% 80%) !important;
-            border-color: #333333 !important;
+            background-color: #1e242d !important;
+            color: #edf0f4 !important;
+            border-color: #303744 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .key-value-table .text-input {
             background-color: transparent !important;
-            color: hsl(0deg 0% 88%) !important;
+            color: #edf0f4 !important;
             border-color: transparent !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .key-value-table .text-input::placeholder {
-            color: #8f8f8f !important;
+            color: #96a0af !important;
             opacity: 1 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .section-title,
         #opencollection-container[data-bruno-theme="dark"] .table-value {
-            color: hsl(0deg 0% 84%) !important;
+            color: #edf0f4 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .tabs-header,
         #opencollection-container[data-bruno-theme="dark"] .tabs,
         #opencollection-container[data-bruno-theme="dark"] .tab-group .tab-header {
-            background-color: hsl(0deg 0% 10%) !important;
-            border-color: #333333 !important;
+            background-color: #0f1115 !important;
+            border-color: #303744 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .tabs .tab,
         #opencollection-container[data-bruno-theme="dark"] .tab-group .tab-button {
-            color: #a8a8a8 !important;
-            border-color: #333333 !important;
+            color: #b5bdc9 !important;
+            border-color: #303744 !important;
             opacity: 1 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .tabs .tab.active,
         #opencollection-container[data-bruno-theme="dark"] .tab-group .tab-button.active {
             color: #f5f5f5 !important;
-            background-color: #222224 !important;
+            background-color: #1e242d !important;
             border-bottom-color: #d9a342 !important;
             box-shadow: inset 0 -2px 0 #d9a342;
         }
@@ -379,48 +473,56 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
         #opencollection-container[data-bruno-theme="dark"] .monaco-editor .margin-view-overlays,
         #opencollection-container[data-bruno-theme="dark"] .monaco-editor .monaco-scrollable-element,
         #opencollection-container[data-bruno-theme="dark"] .monaco-editor .view-lines {
-            background-color: hsl(0deg 0% 10%) !important;
+            background-color: #0f1115 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .monaco-editor .view-line,
         #opencollection-container[data-bruno-theme="dark"] .monaco-editor .line-numbers {
-            color: hsl(0deg 0% 80%) !important;
+            color: #dbeafe !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .monaco-editor .cursor {
             background-color: #d9a342 !important;
             border-color: #d9a342 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .monaco-editor .current-line {
-            border-color: #333333 !important;
+            border-color: #303744 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .markdown-body table tr,
         #opencollection-container[data-bruno-theme="dark"] .markdown-body table td,
         #opencollection-container[data-bruno-theme="dark"] .markdown-body table th {
-            border-color: #333333 !important;
+            border-color: #303744 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .markdown-body table {
             background-color: transparent !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .markdown-body table th {
-            background-color: #26292b !important;
-            color: hsl(0deg 0% 80%) !important;
+            background-color: #1e242d !important;
+            color: #edf0f4 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .markdown-body table td {
-            background-color: hsl(0deg 0% 10%) !important;
-            color: hsl(0deg 0% 80%) !important;
+            background-color: #0f1115 !important;
+            color: #e4e7ec !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .markdown-body table tr:nth-child(2n) {
-            background-color: #1e1e1e !important;
+            background-color: #151922 !important;
         }
         #opencollection-container[data-bruno-theme="dark"] .markdown-body code,
         #opencollection-container[data-bruno-theme="dark"] .markdown-body pre {
-            background-color: #222224 !important;
-            color: hsl(0deg 0% 80%) !important;
+            background-color: #111827 !important;
+            color: #dbeafe !important;
         }
         #opencollection-container[data-bruno-theme="light"] {
             --background-color: #ffffff;
             --text-primary: #111827;
             --text-secondary: #6b7280;
             --border-color: #e5e7eb;
+            --bruno-method-get: hsl(145, 50%, 36%);
+            --bruno-method-post: #3b82f6;
+            --bruno-method-put: hsl(35, 85%, 42%);
+            --bruno-method-delete: hsl(8, 60%, 52%);
+            --bruno-method-patch: hsl(35, 85%, 42%);
+            --bruno-method-options: hsl(178, 50%, 36%);
+            --bruno-method-head: hsl(195, 55%, 42%);
+            --bruno-method-text: #ffffff;
         }
     </style>
     <link rel="stylesheet" href="${CDN_BASE_URL}/docs.css">
@@ -680,9 +782,9 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
                     if (!el || !el.style) {
                         return;
                     }
-                    el.style.setProperty('background-color', 'hsl(0deg 0% 10%)', 'important');
-                    el.style.setProperty('border-color', '#333333', 'important');
-                    el.style.setProperty('color', 'hsl(0deg 0% 80%)', 'important');
+                    el.style.setProperty('background-color', '#0f1115', 'important');
+                    el.style.setProperty('border-color', '#303744', 'important');
+                    el.style.setProperty('color', '#e4e7ec', 'important');
                 }
                 var labels = root.querySelectorAll('span, a, button, div');
                 var collapseNode = null;
@@ -714,15 +816,15 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
                         paintDark(toolbar);
                         var children = toolbar.querySelectorAll('*');
                         for (var c = 0; c < children.length; c++) {
-                            children[c].style.setProperty('color', 'hsl(0deg 0% 80%)', 'important');
-                            children[c].style.setProperty('border-color', '#333333', 'important');
+                            children[c].style.setProperty('color', '#e4e7ec', 'important');
+                            children[c].style.setProperty('border-color', '#303744', 'important');
                         }
                         if (toolbar.previousElementSibling) {
                             paintDark(toolbar.previousElementSibling);
                             var prevChildren = toolbar.previousElementSibling.querySelectorAll('*');
                             for (var pc = 0; pc < prevChildren.length; pc++) {
-                                prevChildren[pc].style.setProperty('background-color', 'hsl(0deg 0% 10%)', 'important');
-                                prevChildren[pc].style.setProperty('color', 'hsl(0deg 0% 80%)', 'important');
+                                prevChildren[pc].style.setProperty('background-color', '#0f1115', 'important');
+                                prevChildren[pc].style.setProperty('color', '#e4e7ec', 'important');
                             }
                         }
                         if (toolbar.parentElement) {
@@ -744,9 +846,186 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
                         paintDark(el);
                         var kids = el.querySelectorAll('*');
                         for (var k = 0; k < kids.length; k++) {
-                            kids[k].style.setProperty('color', 'hsl(0deg 0% 80%)', 'important');
-                            kids[k].style.setProperty('border-color', '#333333', 'important');
+                            kids[k].style.setProperty('color', '#e4e7ec', 'important');
+                            kids[k].style.setProperty('border-color', '#303744', 'important');
                         }
+                    }
+                }
+            }
+            function parseRgb(value) {
+                var match = value && value.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)(?:,\\s*([\\d.]+))?\\)/);
+                if (!match || match[4] === '0') {
+                    return null;
+                }
+                return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)];
+            }
+            function isLightColor(value, threshold) {
+                var rgb = parseRgb(value);
+                return !!rgb && rgb[0] >= threshold && rgb[1] >= threshold && rgb[2] >= threshold;
+            }
+            function isDarkColor(value, threshold) {
+                var rgb = parseRgb(value);
+                return !!rgb && rgb[0] <= threshold && rgb[1] <= threshold && rgb[2] <= threshold;
+            }
+            function applyTryDarkSurfaceOverrides() {
+                if (root.getAttribute('data-bruno-theme') !== 'dark' || !window.getComputedStyle) {
+                    return;
+                }
+                var nodes = [root];
+                var descendants = root.querySelectorAll('*');
+                for (var n = 0; n < descendants.length; n++) {
+                    nodes.push(descendants[n]);
+                }
+                for (var i = 0; i < nodes.length; i++) {
+                    var el = nodes[i];
+                    if (!el || !el.style) {
+                        continue;
+                    }
+                    var cs = window.getComputedStyle(el);
+                    if (!cs || cs.display === 'none') {
+                        continue;
+                    }
+                    var tagName = (el.tagName || '').toLowerCase();
+                    var isFormControl = tagName === 'input' || tagName === 'textarea' || tagName === 'select';
+                    var isTableHeader = tagName === 'th' || (el.closest && el.closest('thead'));
+                    var isChrome = parseInt(cs.height || '0', 10) <= 70 && (cs.cursor === 'row-resize' || isLightColor(cs.backgroundColor, 236));
+                    if (isLightColor(cs.backgroundColor, 232) && cs.backgroundImage === 'none') {
+                        el.style.setProperty('background-color', isFormControl || isTableHeader || isChrome ? '#1e242d' : '#0f1115', 'important');
+                    }
+                    if (isLightColor(cs.borderTopColor, 180)) {
+                        el.style.setProperty('border-color', '#303744', 'important');
+                    }
+                    var webkitTextFillColor = cs.webkitTextFillColor || cs.color;
+                    if ((isDarkColor(cs.color, 96) || isDarkColor(webkitTextFillColor, 96)) && !(el.closest && el.closest('.method-badge, .bruno-method-badge'))) {
+                        var textColor = tagName === 'small' || tagName === 'label' ? '#b5bdc9' : '#e4e7ec';
+                        el.style.setProperty('color', textColor, 'important');
+                        el.style.setProperty('-webkit-text-fill-color', textColor, 'important');
+                    }
+                }
+            }
+            function fixTryMethodBadgeVisibility() {
+                var isDarkTheme = root.getAttribute('data-bruno-theme') === 'dark';
+                var methodStyles = isDarkTheme
+                    ? {
+                        GET: { bg: 'hsl(140, 72%, 68%)' },
+                        POST: { bg: 'hsl(202, 88%, 72%)' },
+                        PUT: { bg: 'hsl(24, 88%, 72%)' },
+                        PATCH: { bg: 'hsl(24, 88%, 72%)' },
+                        DEL: { bg: 'hsl(8, 70%, 60%)' },
+                        DELETE: { bg: 'hsl(8, 70%, 60%)' },
+                        OPTIONS: { bg: 'hsl(170, 70%, 60%)' },
+                        HEAD: { bg: 'hsl(190, 82%, 72%)' }
+                    }
+                    : {
+                        GET: { bg: 'hsl(145, 50%, 36%)' },
+                        POST: { bg: '#3b82f6' },
+                        PUT: { bg: 'hsl(35, 85%, 42%)' },
+                        PATCH: { bg: 'hsl(35, 85%, 42%)' },
+                        DEL: { bg: 'hsl(8, 60%, 52%)' },
+                        DELETE: { bg: 'hsl(8, 60%, 52%)' },
+                        OPTIONS: { bg: 'hsl(178, 50%, 36%)' },
+                        HEAD: { bg: 'hsl(195, 55%, 42%)' }
+                    };
+                var fallbackStyle = isDarkTheme ? { bg: 'hsl(202, 88%, 72%)' } : { bg: '#3b82f6' };
+                var methodTextColor = isDarkTheme ? '#10141c' : '#ffffff';
+                var methodBadges = [];
+                var knownMethods = /^(GET|POST|PUT|PATCH|DEL|DELETE|OPTIONS|HEAD)$/;
+                function addMethodBadge(el) {
+                    if (el && methodBadges.indexOf(el) === -1) {
+                        methodBadges.push(el);
+                    }
+                }
+                function findBadgeContainer(el, row) {
+                    var current = el;
+                    for (var up = 0; up < 5 && current && current !== row && current !== root; up++) {
+                        var text = (current.textContent || '').replace(/\s+/g, '').trim().toUpperCase();
+                        var rect = current.getBoundingClientRect ? current.getBoundingClientRect() : null;
+                        var looksLikeBadge = rect && rect.width <= 120 && rect.height <= 48;
+                        if (knownMethods.test(text) && looksLikeBadge) {
+                            return current;
+                        }
+                        current = current.parentElement;
+                    }
+                    return el;
+                }
+                var classBadges = root.querySelectorAll('.method-badge');
+                for (var cb = 0; cb < classBadges.length; cb++) {
+                    addMethodBadge(classBadges[cb]);
+                }
+                var methodLeaves = root.querySelectorAll('div, span, p, button');
+                for (var ml = 0; ml < methodLeaves.length; ml++) {
+                    var methodLeaf = methodLeaves[ml];
+                    var methodLeafText = (methodLeaf.textContent || '').replace(/\s+/g, '').trim().toUpperCase();
+                    if (!knownMethods.test(methodLeafText)) {
+                        continue;
+                    }
+                    var methodRect = methodLeaf.getBoundingClientRect ? methodLeaf.getBoundingClientRect() : null;
+                    if (!methodRect || methodRect.width > 140 || methodRect.height > 56) {
+                        continue;
+                    }
+                    addMethodBadge(findBadgeContainer(methodLeaf, root));
+                }
+                var sidebar = root.querySelector('.playground-sidebar');
+                if (sidebar) {
+                    var rows = sidebar.querySelectorAll('div[style*="padding-left"]');
+                    for (var r = 0; r < rows.length; r++) {
+                        var leaves = rows[r].querySelectorAll('div, span, p');
+                        for (var l = 0; l < leaves.length; l++) {
+                            var leaf = leaves[l];
+                            var leafText = (leaf.textContent || '').replace(/\s+/g, '').trim().toUpperCase();
+                            if (knownMethods.test(leafText)) {
+                                addMethodBadge(findBadgeContainer(leaf, rows[r]));
+                            }
+                        }
+                    }
+                }
+                for (var i = 0; i < methodBadges.length; i++) {
+                    var badge = methodBadges[i];
+                    var method = (badge.textContent || '').replace(/\s+/g, '').trim().toUpperCase();
+                    var style = methodStyles[method] || fallbackStyle;
+                    badge.classList.add('bruno-method-badge');
+                    badge.style.setProperty('background-color', style.bg, 'important');
+                    badge.style.setProperty('border-color', 'transparent', 'important');
+                    badge.style.setProperty('color', methodTextColor, 'important');
+                    badge.style.setProperty('-webkit-text-fill-color', methodTextColor, 'important');
+                    badge.style.setProperty('font-weight', '800', 'important');
+                    badge.style.setProperty('opacity', '1', 'important');
+                    var children = badge.querySelectorAll('*');
+                    for (var c = 0; c < children.length; c++) {
+                        children[c].style.setProperty('color', methodTextColor, 'important');
+                        children[c].style.setProperty('-webkit-text-fill-color', methodTextColor, 'important');
+                        children[c].style.setProperty('opacity', '1', 'important');
+                    }
+                }
+            }
+            function fixTrySidebarApiLabelVisibility() {
+                if (root.getAttribute('data-bruno-theme') !== 'dark') {
+                    return;
+                }
+                var sidebar = root.querySelector('.playground-sidebar');
+                if (!sidebar) {
+                    return;
+                }
+                var rows = sidebar.querySelectorAll('div[style*="padding-left"]');
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    if (!row.querySelector('.method-badge, .bruno-method-badge')) {
+                        continue;
+                    }
+                    var textNodes = row.querySelectorAll('div, span, p, a');
+                    for (var j = 0; j < textNodes.length; j++) {
+                        var node = textNodes[j];
+                        if (node.closest && node.closest('.method-badge, .bruno-method-badge')) {
+                            continue;
+                        }
+                        var txt = (node.textContent || '').trim();
+                        if (!txt) {
+                            continue;
+                        }
+                        node.style.setProperty('color', '#edf0f4', 'important');
+                        node.style.setProperty('-webkit-text-fill-color', '#edf0f4', 'important');
+                        node.style.setProperty('opacity', '1', 'important');
+                        node.style.setProperty('visibility', 'visible', 'important');
                     }
                 }
             }
@@ -807,6 +1086,9 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
                 mountSidebarSearch();
                 applySidebarSearchFilter();
                 applyTryToolbarDarkTheme();
+                applyTryDarkSurfaceOverrides();
+                fixTryMethodBadgeVisibility();
+                fixTrySidebarApiLabelVisibility();
                 bindScrollSync();
             }
             function getCurrentVisibleSectionId() {
@@ -1069,23 +1351,20 @@ const buildHtmlDocument = (collectionName, escapedYamlContent, docHttpLeafNamesB
                     return;
                 }
                 sectionToSidebarRowMap = null;
-                folderToSectionMap = null;
                 if (row.querySelector('.method-badge')) {
                     return;
                 }
+                var content = root.querySelector('.playground-content');
+                var contentScrollTop = content ? content.scrollTop : 0;
+                var pageScrollX = window.scrollX || window.pageXOffset || 0;
+                var pageScrollY = window.scrollY || window.pageYOffset || 0;
                 setTimeout(function () {
-                    if (!folderToSectionMap || !folderToSectionMap.size) {
-                        folderToSectionMap = buildFolderSectionMap();
+                    if (content) {
+                        content.scrollTop = contentScrollTop;
                     }
-                    var section = folderToSectionMap.get(row);
-                    if (!section) {
-                        folderToSectionMap = buildFolderSectionMap();
-                        section = folderToSectionMap.get(row);
+                    if (typeof window.scrollTo === 'function') {
+                        window.scrollTo(pageScrollX, pageScrollY);
                     }
-                    if (!section || typeof section.scrollIntoView !== 'function') {
-                        return;
-                    }
-                    section.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'auto' });
                 }, 0);
             }, true);
             schedulePatch();
