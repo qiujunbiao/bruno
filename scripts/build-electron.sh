@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Build web assets first so Electron package always has latest bundle.
+npm run build --workspace=packages/bruno-app
 
 # Remove out directory
 rm -rf packages/bruno-electron/out
@@ -10,12 +14,20 @@ rm -rf packages/bruno-electron/web
 mkdir packages/bruno-electron/web
 
 # Copy build
-cp -r packages/bruno-app/dist/* packages/bruno-electron/web
+cp -r packages/bruno-app/dist/. packages/bruno-electron/web
 
 
 # Update static paths
-sed -i'' -e 's@/static/@static/@g' packages/bruno-electron/web/**.html
-sed -i'' -e 's@/static/font@../../static/font@g' packages/bruno-electron/web/static/css/**.**.css
+for htmlFile in packages/bruno-electron/web/*.html; do
+  if [ -f "$htmlFile" ]; then
+    sed -i'' -e 's@/static/@static/@g' "$htmlFile"
+  fi
+done
+for cssFile in packages/bruno-electron/web/static/css/*.css; do
+  if [ -f "$cssFile" ]; then
+    sed -i'' -e 's@/static/font@../../static/font@g' "$cssFile"
+  fi
+done
 
 # Remove sourcemaps
 find packages/bruno-electron/web -name '*.map' -type f -delete
