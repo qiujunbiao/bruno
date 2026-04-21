@@ -1,7 +1,0 @@
-info:
-  name: 工作表行记录
-  type: folder
-  seq: 4
-
-request:
-  auth: inherit
