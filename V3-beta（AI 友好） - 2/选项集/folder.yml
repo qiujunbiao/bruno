@@ -1,0 +1,7 @@
+info:
+  name: 选项集
+  type: folder
+  seq: 8
+
+request:
+  auth: inherit

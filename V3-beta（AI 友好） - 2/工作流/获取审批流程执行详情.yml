@@ -1,0 +1,65 @@
+info:
+  name: 获取审批流程执行详情
+  type: http
+  seq: 5
+  tags:
+    - 工作流
+
+http:
+  method: GET
+  url: "{{baseUrl}}/v3/app/workflow/:worksheet_id/rows/:row_id/approval/:approval_id"
+  headers:
+    - name: HAP-Appkey
+      value: "{{apiKey}}"
+  params:
+    - name: worksheet_id
+      value: ""
+      type: path
+    - name: row_id
+      value: ""
+      type: path
+    - name: approval_id
+      value: ""
+      type: path
+  auth:
+    type: apikey
+    key: HAP-Appkey
+    value: "{{apiKey}}"
+    placement: header
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Successful response
+    request:
+      url: "{{baseUrl}}/v3/app/workflow/:worksheet_id/rows/:row_id/approval/:approval_id"
+      method: GET
+      headers:
+        - name: HAP-Appkey
+          value: "{{apiKey}}"
+      params:
+        - name: worksheet_id
+          value: ""
+          type: path
+        - name: row_id
+          value: ""
+          type: path
+        - name: approval_id
+          value: ""
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: "{}"
+
+docs: 获取指定工作表行记录下某条审批流程执行的详细信息
