@@ -1,0 +1,7 @@
+info:
+  name: 工作表
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit

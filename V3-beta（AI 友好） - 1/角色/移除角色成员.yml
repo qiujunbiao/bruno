@@ -1,0 +1,93 @@
+info:
+  name: 移除角色成员
+  type: http
+  seq: 6
+  tags:
+    - 角色
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/v3/app/roles/:role_id/members"
+  headers:
+    - name: HAP-Appkey
+      value: "{{apiKey}}"
+  params:
+    - name: role_id
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "userIds": [
+          ""
+        ],
+        "departmentIds": [
+          ""
+        ],
+        "departmentTreeIds": [
+          ""
+        ],
+        "jobIds": [
+          ""
+        ],
+        "orgRoleIds": [
+          ""
+        ]
+      }
+  auth:
+    type: apikey
+    key: HAP-Appkey
+    value: "{{apiKey}}"
+    placement: header
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Successful response
+    request:
+      url: "{{baseUrl}}/v3/app/roles/:role_id/members"
+      method: DELETE
+      headers:
+        - name: HAP-Appkey
+          value: "{{apiKey}}"
+      params:
+        - name: role_id
+          value: ""
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "userIds": [
+              ""
+            ],
+            "departmentIds": [
+              ""
+            ],
+            "departmentTreeIds": [
+              ""
+            ],
+            "jobIds": [
+              ""
+            ],
+            "orgRoleIds": [
+              ""
+            ]
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: "{}"
+
+docs: 移出角色下成员

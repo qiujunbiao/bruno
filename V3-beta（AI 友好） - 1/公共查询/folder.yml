@@ -1,0 +1,7 @@
+info:
+  name: 公共查询
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit
